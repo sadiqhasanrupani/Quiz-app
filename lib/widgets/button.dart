@@ -19,36 +19,26 @@ class Button extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return showIcon == true
-        ? ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: bgColor ?? Colors.purple[500],
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(40),
-                ),
+        ? Container(
+            margin: const EdgeInsets.only(bottom: 5, top: 5),
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: bgColor ?? Colors.purple[500],
               ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 40,
-              ),
+              onPressed: onPressed,
+              label: label,
+              icon: icon,
             ),
-            onPressed: onPressed,
-            label: label,
-            icon: icon,
           )
-        : ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: bgColor ?? Colors.purple[500],
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(40),
-                ),
+        : Container(
+            margin: const EdgeInsets.only(bottom: 5, top: 5),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: bgColor ?? Colors.purple[500],
               ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 40,
-              ),
+              onPressed: onPressed,
+              child: label,
             ),
-            onPressed: onPressed,
-            child: label,
           );
   }
 }

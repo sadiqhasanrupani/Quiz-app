@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+
+import 'package:quiz_app/data/questions.dart';
+import 'package:quiz_app/model/quiz_question.dart';
+import 'package:quiz_app/model/quiz_result.dart';
 import 'package:quiz_app/screens/home.dart';
 import 'package:quiz_app/screens/questions_screen.dart';
+import 'package:quiz_app/screens/result_screen.dart';
 
 class Quiz extends StatefulWidget {
   const Quiz({super.key});
@@ -13,6 +18,7 @@ class Quiz extends StatefulWidget {
 
 class _QuizState extends State<Quiz> {
   var activeScreen = 'active-screen';
+  List<Answer> selectedAnswer = [];
 
   void switchScreenHandler() {
     setState(() {
@@ -20,11 +26,61 @@ class _QuizState extends State<Quiz> {
     });
   }
 
+  void populateSelectedAnswers(Answer answer) {
+    selectedAnswer.add(
+      Answer(
+        title: answer.title,
+        correctAns: answer.correctAns,
+      ),
+    );
+
+    if (selectedAnswer.length == questions.length) {
+      setState(() {
+        activeScreen = 'result-screen';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext ctx) {
     Widget screenWidget = HomeScreen(switchScreenHandler);
     if (activeScreen == "question-screen") {
-      screenWidget = const QuestionsScreen();
+      screenWidget = QuestionsScreen(
+        onSelectedAnswer: populateSelectedAnswers,
+      );
+    } else if (activeScreen == "result-screen") {
+      List<Result> correctAnswers = [];
+      int count = 0;
+
+      for (var i = 0; i < questions.length; i++) {
+        final currentSelectedAns = selectedAnswer[i];
+        final correctAns =
+            questions[i].answers.firstWhere((ans) => ans.correctAns == true);
+
+        if (currentSelectedAns.title == correctAns.title) {
+          if (currentSelectedAns.correctAns == true) {
+            count++;
+          }
+        }
+
+        correctAnswers.add(
+          Result(
+            question: questions[i].title,
+            givenAnswer: selectedAnswer[i].title,
+            correctAnswer: correctAns.title,
+          ),
+        );
+      }
+
+      QuizResult quizResult = QuizResult(
+        correctCount: count,
+        totalCount: questions.length,
+        results: correctAnswers,
+      );
+
+      screenWidget = ResultScreen(
+        quizResult: quizResult,
+      );
     } else {
       screenWidget = HomeScreen(switchScreenHandler);
     }

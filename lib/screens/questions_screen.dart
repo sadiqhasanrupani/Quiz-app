@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import "package:google_fonts/google_fonts.dart";
+import 'package:quiz_app/model/quiz_question.dart';
 
 import 'package:quiz_app/screens/utils/global_colors.dart';
 import 'package:quiz_app/widgets/button.dart';
 import 'package:quiz_app/data/questions.dart';
 
 class QuestionsScreen extends StatefulWidget {
-  const QuestionsScreen({super.key});
+  final void Function(Answer selectedAns) onSelectedAnswer;
+  const QuestionsScreen({super.key, required this.onSelectedAnswer});
 
   @override
   State<StatefulWidget> createState() {
@@ -14,9 +18,18 @@ class QuestionsScreen extends StatefulWidget {
 }
 
 class _QuestionsScreenState extends State<QuestionsScreen> {
+  var currentQuesIdx = 0;
+  void onSelectedAnswer(Answer selectedAns) {
+    widget.onSelectedAnswer(selectedAns);
+
+    setState(() {
+      currentQuesIdx++;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final currentQues = questions[0];
+    var currentQues = questions[currentQuesIdx];
 
     return SizedBox(
       width: double.infinity,
@@ -29,24 +42,31 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
           children: [
             Text(
               currentQues.title,
-              style: const TextStyle(
+              style: GoogleFonts.lato(
                 color: textColor,
                 fontSize: 16,
+                fontWeight: FontWeight.w800,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30),
-            ...currentQues.answers.map(
+            ...currentQues.getShuffleAnswers().map(
               (answer) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Button(
-                      label: BtnText(answer.titles),
-                      onPressed: () {},
-                    ),
-                    const SizedBox(
-                      height: 10,
+                      label: BtnText(
+                        answer.title,
+                      ),
+                      onPressed: () {
+                        onSelectedAnswer(
+                          Answer(
+                            title: answer.title,
+                            correctAns: answer.correctAns ?? false,
+                          ),
+                        );
+                      },
                     ),
                   ],
                 );
@@ -66,11 +86,18 @@ class BtnText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(
-        color: textColor,
-        fontSize: 18,
+    // Check if center is not null before using it
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.raleway(
+          color: textColor,
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }

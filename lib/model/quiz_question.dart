@@ -1,7 +1,7 @@
 class Answer {
-  const Answer({required this.titles, this.correctAns = false});
+  const Answer({required this.title, this.correctAns = false});
 
-  final String titles;
+  final String title;
   final bool? correctAns;
 }
 
@@ -10,4 +10,10 @@ class QuizQuestion {
 
   final String title;
   final List<Answer> answers;
+
+  List<Answer> getShuffleAnswers() {
+    final shuffledLists = List.of(answers);
+    shuffledLists.shuffle();
+    return shuffledLists;
+  }
 }
