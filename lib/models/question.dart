@@ -1,22 +1,23 @@
-import "package:flutter/foundation.dart";
-
-@immutable
 class Question {
-  final String id;
   final String text;
   final List<String> options;
-  final int correctIndex;
-  final String? explanation;
+  final int correctAnswerIndex;
 
-  const Question({
-    required this.id,
+  Question({
     required this.text,
     required this.options,
-    required this.correctIndex,
-    required this.explanation,
-  }) : assert(options.length >= 2, 'A Question must have at least 2 options.'),
-       assert(
-         correctIndex >= 0 && correctIndex < options.length,
-         'correctIndex must be a valid index into optoins.',
-       );
+    required this.correctAnswerIndex,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'text': text,
+        'options': options,
+        'correctAnswerIndex': correctAnswerIndex,
+      };
+
+  factory Question.fromJson(Map<String, dynamic> json) => Question(
+        text: json['text'] as String,
+        options: List<String>.from(json['options'] as List),
+        correctAnswerIndex: json['correctAnswerIndex'] as int,
+      );
 }

@@ -7,24 +7,58 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 import 'package:quiz_app/main.dart';
+import 'package:quiz_app/services/storage_service.dart';
 
+import 'widget_test.mocks.dart';
+
+// Generate mocks by running: flutter packages pub run build_runner build
+@GenerateMocks([StorageService])
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('Main App Tests', () {
+    late MockStorageService mockStorageService;
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    setUp(() {
+      mockStorageService = MockStorageService();
+      when(mockStorageService.getLastScore()).thenReturn(null);
+      when(mockStorageService.getResumeData()).thenReturn(null);
+    });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    testWidgets('App loads and displays welcome screen', (WidgetTester tester) async {
+      // Build our app and trigger a frame.
+      await tester.pumpWidget(MyApp(storageService: mockStorageService));
+      await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+      // Verify that the welcome screen is displayed
+      expect(find.text('Flutter Quiz Challenge'), findsOneWidget);
+      expect(find.text('Start New Quiz'), findsOneWidget);
+    });
+
+    testWidgets('App supports dark mode', (WidgetTester tester) async {
+      // Build our app in dark mode and trigger a frame.
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(platformBrightness: Brightness.dark),
+          child: MyApp(storageService: mockStorageService),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify that the app loads in dark mode
+      final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
+      expect(materialApp.darkTheme, isNotNull);
+      expect(materialApp.themeMode, ThemeMode.system);
+    });
+
+    testWidgets('App has proper accessibility setup', (WidgetTester tester) async {
+      // Build our app and trigger a frame.
+      await tester.pumpWidget(MyApp(storageService: mockStorageService));
+      await tester.pumpAndSettle();
+
+      // Verify semantic label exists
+      expect(find.bySemanticsLabel('Flutter Quiz Challenge App'), findsOneWidget);
+    });
   });
 }
